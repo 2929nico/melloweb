@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Futura Mellow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --p0: #0a0010;
+      --p1: #1e0040;
+      --p2: #3b0764;
+      --p3: #5b21b6;
+      --p4: #7c3aed;
+      --p5: #a78bfa;
+      --p6: #ddd6fe;
+      --white: #ffffff;
+      --black: #000000;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--p1);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ─── CURSOR GLOW ─── */
+    .cursor-glow {
+      position: fixed;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      transition: left .08s ease, top .08s ease;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      padding: 0 6%;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10,0,16,0);
+      transition: background .4s, backdrop-filter .4s;
+    }
+    nav.scrolled {
+      background: rgba(10,0,16,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(167,139,250,0.12);
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .nav-logo em { color: var(--p5); font-style: normal; }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--p5); }
+
+    .nav-ig {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--white);
+      text-decoration: none;
+      background: var(--p3);
+      border-radius: 6px;
+      padding: 8px 16px;
+      transition: background .2s, transform .15s;
+    }
+    .nav-ig:hover { background: var(--p4); transform: translateY(-1px); }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh;
+      padding: 68px 6% 0;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* animated bg gradient */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 60% 40%, rgba(91,33,182,0.45) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 80% at 20% 80%, rgba(59,7,100,0.6) 0%, transparent 60%),
+        var(--p0);
+      animation: hero-pulse 8s ease-in-out infinite alternate;
+    }
+    @keyframes hero-pulse {
+      0%   { opacity: 1; }
+      100% { opacity: 0.75; filter: hue-rotate(15deg); }
+    }
+
+    /* grid lines */
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(167,139,250,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(167,139,250,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      align-items: center;
+      gap: 4rem;
+      width: 100%;
+      padding-bottom: 6rem;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--p5);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fade-up .6s .2s forwards;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 24px; height: 1px;
+      background: var(--p5);
+    }
+
+    .hero-h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 11vw, 10rem);
+      line-height: 0.92;
+      letter-spacing: 0.02em;
+      color: var(--white);
+      opacity: 0;
+      animation: fade-up .7s .35s forwards;
+    }
+    .hero-h1 .line-purple { color: var(--p5); }
+    .hero-h1 .line-outline {
+      -webkit-text-stroke: 2px rgba(255,255,255,0.35);
+      color: transparent;
+    }
+
+    .hero-desc {
+      margin-top: 2rem;
+      font-size: 1rem;
+      line-height: 1.75;
+      color: rgba(255,255,255,0.55);
+      max-width: 400px;
+      opacity: 0;
+      animation: fade-up .6s .55s forwards;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      opacity: 0;
+      animation: fade-up .6s .7s forwards;
+    }
+
+    .btn-fill {
+      padding: 14px 30px;
+      background: var(--p4);
+      color: var(--white);
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background .2s, transform .15s, box-shadow .2s;
+    }
+    .btn-fill:hover {
+      background: var(--p5);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(124,58,237,0.5);
+    }
+
+    .btn-ghost {
+      padding: 14px 30px;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.75);
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-ghost:hover { border-color: var(--p5); color: var(--p5); }
+
+    /* hero right – ball */
+    .hero-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      animation: fade-in .8s .5s forwards;
+    }
+
+    .ball-scene {
+      position: relative;
+      width: min(360px,80vw);
+      aspect-ratio: 1;
+    }
+
+    .orbit {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(167,139,250,0.2);
+      animation: orbit-spin linear infinite;
+    }
+    .orbit-1 { animation-duration: 14s; }
+    .orbit-2 { inset: 20px; border-color: rgba(167,139,250,0.12); animation-duration: 22s; animation-direction: reverse; }
+    .orbit-3 { inset: 40px; border-color: rgba(167,139,250,0.07); animation-duration: 32s; }
+
+    .orbit-dot {
+      position: absolute;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--p4);
+      top: -4px; left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 10px var(--p4);
+    }
+
+    @keyframes orbit-spin { to { transform: rotate(360deg); } }
+
+    .ball-core {
+      position: absolute;
+      inset: 60px;
+      background: radial-gradient(circle at 38% 35%, #7c3aed, #2d0057);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4.5rem;
+      box-shadow:
+        0 0 60px rgba(124,58,237,0.6),
+        0 0 120px rgba(124,58,237,0.25),
+        inset 0 -20px 40px rgba(0,0,0,0.4);
+      animation: ball-float 4s ease-in-out infinite;
+    }
+    @keyframes ball-float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-14px); }
+    }
+
+    /* hero stats strip */
+    .hero-stats {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid rgba(167,139,250,0.15);
+      display: flex;
+      padding: 1.4rem 6%;
+      gap: 0;
+      z-index: 2;
+      opacity: 0;
+      animation: fade-up .6s .9s forwards;
+    }
+    .stat-block {
+      flex: 1;
+      text-align: center;
+      position: relative;
+    }
+    .stat-block + .stat-block::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 20%; bottom: 20%;
+      width: 1px;
+      background: rgba(167,139,250,0.2);
+    }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.6rem;
+      line-height: 1;
+      color: var(--p5);
+      letter-spacing: 0.03em;
+    }
+    .stat-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-top: 2px;
+    }
+
+    /* ─── SHARED REVEAL ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: .1s; }
+    .reveal-delay-2 { transition-delay: .2s; }
+    .reveal-delay-3 { transition-delay: .3s; }
+    .reveal-delay-4 { transition-delay: .4s; }
+
+    @keyframes fade-up {
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes fade-in {
+      to { opacity: 1; }
+    }
+
+    /* ─── SECTION COMMON ─── */
+    section { padding: 110px 6%; position: relative; }
+
+    .sec-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--p5);
+      margin-bottom: 0.6rem;
+    }
+    .sec-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      line-height: 1;
+      letter-spacing: 0.03em;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+    .sec-sub {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.45);
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: 4rem;
+    }
+
+    /* ─── ABOUT ─── */
+    #about { background: var(--p2); overflow: hidden; }
+
+    #about::before {
+      content: 'FM';
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28rem;
+      line-height: 1;
+      color: rgba(255,255,255,0.025);
+      position: absolute;
+      right: -2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      letter-spacing: -0.05em;
+    }
+
+    .about-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .about-text p {
+      font-size: 1.05rem;
+      line-height: 1.9;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 1.4rem;
+    }
+    .about-text p strong { color: var(--white); font-weight: 700; }
+
+    .about-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .about-card {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(167,139,250,0.1);
+      border-radius: 12px;
+      padding: 1.6rem;
+      transition: border-color .3s, background .3s, transform .3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--p4), var(--p5));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .3s;
+    }
+    .about-card:hover { border-color: rgba(167,139,250,0.3); background: rgba(91,33,182,0.15); transform: translateY(-4px); }
+    .about-card:hover::before { transform: scaleX(1); }
+
+    .about-card .icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
+    .about-card h4 { font-size: 0.95rem; font-weight: 800; color: var(--white); margin-bottom: 0.3rem; }
+    .about-card p { font-size: 0.8rem; color: rgba(255,255,255,0.38); line-height: 1.5; }
+
+    /* ─── ROSTER ─── */
+    #roster { background: var(--p1); }
+
+    .roster-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 0;
+    }
+    .roster-header .sec-sub { margin-bottom: 0; }
+
+    .roster-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 3rem;
+    }
+
+    .player-card {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(167,139,250,0.1);
+      border-radius: 12px;
+      padding: 1.8rem 1.2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      transition: border-color .3s, transform .3s, box-shadow .3s;
+    }
+    .player-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(124,58,237,0.18), transparent 70%);
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .player-card:hover {
+      border-color: rgba(167,139,250,0.45);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .player-card:hover::after { opacity: 1; }
+
+    .player-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem;
+      line-height: 1;
+      color: rgba(167,139,250,0.12);
+      position: absolute;
+      top: 0.4rem;
+      right: 0.8rem;
+      letter-spacing: -0.02em;
+      transition: color .3s;
+    }
+    .player-card:hover .player-num { color: rgba(167,139,250,0.3); }
+
+    .player-avatar {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--p3), var(--p2));
+      border: 2px solid rgba(167,139,250,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin: 0 auto 1rem;
+    }
+
+    .player-name {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 0.2rem;
+    }
+    .player-pos {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--p5);
+    }
+
+    /* ─── SCHEDULE ─── */
+    #schedule {
+      background: var(--p0);
+    }
+    #schedule::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--p4), transparent);
+    }
+
+    .matches-wrap { max-width: 780px; }
+
+    .match-row {
+      display: grid;
+      grid-template-columns: 1fr 160px 1fr;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.6rem 2rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(167,139,250,0.08);
+      border-radius: 12px;
+      margin-bottom: 0.75rem;
+      transition: background .25s, border-color .25s, transform .25s;
+    }
+    .match-row:hover {
+      background: rgba(91,33,182,0.12);
+      border-color: rgba(167,139,250,0.25);
+      transform: translateX(6px);
+    }
+    .match-row.upcoming {
+      border-style: dashed;
+      border-color: rgba(167,139,250,0.2);
+    }
+
+    .match-team-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--white);
+    }
+    .match-team-name.right { text-align: right; }
+
+    .match-mid { text-align: center; }
+
+    .match-score {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 0.05em;
+      color: var(--p5);
+      line-height: 1;
+    }
+    .match-row.upcoming .match-score {
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0;
+    }
+
+    .match-date {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.3);
+      font-weight: 500;
+      margin-top: 2px;
+      letter-spacing: 0.05em;
+    }
+
+    .match-badge {
+      display: inline-block;
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 4px;
+      margin-top: 5px;
+    }
+    .b-win   { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
+    .b-loss  { background: rgba(239,68,68,0.12);  color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+    .b-draw  { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+    .b-next  { background: rgba(124,58,237,0.18); color: var(--p5); border: 1px solid rgba(167,139,250,0.3); }
+
+    /* ─── GALLERY ─── */
+    #gallery { background: var(--p2); }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: 240px 240px;
+      gap: 1rem;
+    }
+    .gallery-grid .g0 { grid-row: span 2; }
+
+    .g-item {
+      border-radius: 12px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(167,139,250,0.1);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      position: relative;
+      cursor: pointer;
+      transition: transform .3s, box-shadow .3s;
+    }
+    .g-item:hover { transform: scale(1.03); box-shadow: 0 16px 48px rgba(0,0,0,0.5); }
+
+    .g-item .g-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(91,33,182,0.4), rgba(30,0,64,0.8));
+    }
+
+    .g-item .g-icon { position: relative; z-index: 1; }
+
+    .g-item .g-label {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+      padding: 1.5rem 1rem 0.8rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      z-index: 2;
+      transform: translateY(100%);
+      transition: transform .3s;
+    }
+    .g-item:hover .g-label { transform: translateY(0); }
+
+    .gallery-cta {
+      text-align: center;
+      margin-top: 2.5rem;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--black);
+      padding: 3rem 6%;
+      border-top: 1px solid rgba(167,139,250,0.1);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.05em;
+      color: var(--white);
+    }
+    .footer-logo em { color: var(--p4); font-style: normal; }
+
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .footer-links a {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.3);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--p5); }
+
+    .footer-ig a {
+      color: var(--p5);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .footer-ig a:hover { color: var(--white); }
+
+    .footer-copy {
+      width: 100%;
+      text-align: center;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.15);
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      margin-top: 1.5rem;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--p0); }
+    ::-webkit-scrollbar-thumb { background: var(--p3); border-radius: 3px; }
+
+    /* ─── MOBILE ─── */
+    @media (max-width: 860px) {
+      .hero-inner { grid-template-columns: 1fr; padding-bottom: 7rem; }
+      .hero-right { display: none; }
+      .about-layout { grid-template-columns: 1fr; gap: 3rem; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+      .gallery-grid .g0 { grid-row: span 1; }
+      .match-row { grid-template-columns: 1fr; text-align: center; gap: 0.5rem; transform: none !important; }
+      .match-team-name.right { text-align: center; }
+    }
+    @media (max-width: 560px) {
+      .nav-links { display: none; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      #about::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- ─── NAV ─── -->
+<nav id="mainNav">
+  <a href="#hero" class="nav-logo">FUTURA <em>MELLOW</em></a>
+  <ul class="nav-links">
+    <li><a href="#about">Chi Siamo</a></li>
+    <li><a href="#roster">Squadra</a></li>
+    <li><a href="#schedule">Risultati</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+  </ul>
+  <a href="https://www.instagram.com/mellowteam2024" target="_blank" class="nav-ig">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+    @mellowteam2024
+  </a>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-eyebrow">Futura Mellow FC &nbsp;·&nbsp; Est. 2024</div>
+      <h1 class="hero-h1">
+        <span class="line-outline">WE</span><br>
+        <span class="line-purple">PLAY</span><br>
+        MELLOW
+      </h1>
+      <p class="hero-desc">
+        Una squadra, una mentalità. Sul campo diamo tutto —
+        fuori dal campo siamo una famiglia. Segui la nostra storia.
+      </p>
+      <div class="hero-btns">
+        <a href="#schedule" class="btn-fill">Vedi i Risultati</a>
+        <a href="#roster" class="btn-ghost">La Squadra</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="ball-scene">
+        <div class="orbit orbit-1"><div class="orbit-dot"></div></div>
+        <div class="orbit orbit-2"><div class="orbit-dot"></div></div>
+        <div class="orbit orbit-3"><div class="orbit-dot"></div></div>
+        <div class="ball-core">⚽</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-block">
+      <div class="stat-num" data-count="2024" data-raw>2024</div>
+      <div class="stat-label">Fondazione</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num" data-count="11">0</div>
+      <div class="stat-label">Giocatori</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num" data-count="5">0</div>
+      <div class="stat-label">Partite</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num" data-count="3">0</div>
+      <div class="stat-label">Vittorie</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ABOUT ─── -->
+<section id="about">
+  <div class="about-layout">
+    <div class="about-text reveal">
+      <p class="sec-label">Chi Siamo</p>
+      <h2 class="sec-title">IL MODO<br>MELLOW</h2>
+      <p>
+        <strong>Futura Mellow nasce nel 2024</strong> da un gruppo di amici uniti dalla passione per il calcio e per qualcosa di più — uno stile, una vibe, un'identità propria.
+      </p>
+      <p>
+        In campo siamo intensi, concentrati, determinati. Fuori dal campo siamo una crew. Ogni partita è un capitolo della nostra storia, e la stiamo scrivendo insieme.
+      </p>
+      <p>
+        Seguici su Instagram <a href="https://www.instagram.com/mellowteam2024" target="_blank" style="color:var(--p5);font-weight:700;text-decoration:none;">@mellowteam2024</a> e vivi il viaggio con noi.
+      </p>
+    </div>
+
+    <div class="about-cards reveal reveal-delay-2">
+      <div class="about-card">
+        <div class="icon">⚡</div>
+        <h4>Intensità</h4>
+        <p>Non scendiamo in campo per fare numero.</p>
+      </div>
+      <div class="about-card">
+        <div class="icon">🤝</div>
+        <h4>Fratellanza</h4>
+        <p>Questa squadra è una famiglia prima di tutto.</p>
+      </div>
+      <div class="about-card">
+        <div class="icon">📈</div>
+        <h4>Crescita</h4>
+        <p>Ogni gara ci rende più forti e più uniti.</p>
+      </div>
+      <div class="about-card">
+        <div class="icon">😎</div>
+        <h4>Stile</h4>
+        <p>Giochiamo bene e lo facciamo con classe.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ROSTER ─── -->
+<!--
+  ════════════════════════════════════════════════════════
+  COME AGGIUNGERE / MODIFICARE GIOCATORI:
+  Ogni giocatore è un blocco <div class="player-card">.
+  Cambia:
+    • player-num   → numero di maglia  (es. #10)
+    • player-avatar → emoji del ruolo
+    • player-name  → nome del giocatore
+    • player-pos   → posizione (es. Attaccante)
+  Per aggiungerne uno, copia un intero blocco .player-card
+  e incollalo dentro .roster-grid.
+  ════════════════════════════════════════════════════════
+-->
+<section id="roster">
+  <div class="roster-header">
+    <div>
+      <p class="sec-label reveal">La Rosa</p>
+      <h2 class="sec-title reveal">LA SQUADRA</h2>
+    </div>
+    <p class="sec-sub reveal">Aggiorna nomi e numeri con i tuoi veri giocatori.</p>
+  </div>
+
+  <div class="roster-grid">
+    <div class="player-card reveal">
+      <div class="player-num">#1</div>
+      <div class="player-avatar">🧤</div>
+      <div class="player-name">Portiere</div>
+      <div class="player-pos">Goalkeeper</div>
+    </div>
+    <div class="player-card reveal reveal-delay-1">
+      <div class="player-num">#2</div>
+      <div class="player-avatar">🛡️</div>
+      <div class="player-name">Difensore</div>
+      <div class="player-pos">Terzino Dx</div>
+    </div>
+    <div class="player-card reveal reveal-delay-1">
+      <div class="player-num">#3</div>
+      <div class="player-avatar">🛡️</div>
+      <div class="player-name">Difensore</div>
+      <div class="player-pos">Terzino Sx</div>
+    </div>
+    <div class="player-card reveal reveal-delay-2">
+      <div class="player-num">#4</div>
+      <div class="player-avatar">🛡️</div>
+      <div class="player-name">Difensore</div>
+      <div class="player-pos">Centrale</div>
+    </div>
+    <div class="player-card reveal reveal-delay-2">
+      <div class="player-num">#5</div>
+      <div class="player-avatar">🛡️</div>
+      <div class="player-name">Difensore</div>
+      <div class="player-pos">Centrale</div>
+    </div>
+    <div class="player-card reveal reveal-delay-3">
+      <div class="player-num">#6</div>
+      <div class="player-avatar">⚙️</div>
+      <div class="player-name">Centrocampista</div>
+      <div class="player-pos">Mediano</div>
+    </div>
+    <div class="player-card reveal reveal-delay-3">
+      <div class="player-num">#8</div>
+      <div class="player-avatar">⚙️</div>
+      <div class="player-name">Centrocampista</div>
+      <div class="player-pos">Mezzala</div>
+    </div>
+    <div class="player-card reveal reveal-delay-4">
+      <div class="player-num">#10</div>
+      <div class="player-avatar">🎨</div>
+      <div class="player-name">Fantasista</div>
+      <div class="player-pos">Trequartista</div>
+    </div>
+    <div class="player-card reveal reveal-delay-4">
+      <div class="player-num">#7</div>
+      <div class="player-avatar">🚀</div>
+      <div class="player-name">Ala</div>
+      <div class="player-pos">Ala Sinistra</div>
+    </div>
+    <div class="player-card reveal reveal-delay-4">
+      <div class="player-num">#11</div>
+      <div class="player-avatar">🚀</div>
+      <div class="player-name">Ala</div>
+      <div class="player-pos">Ala Destra</div>
+    </div>
+    <div class="player-card reveal reveal-delay-4">
+      <div class="player-num">#9</div>
+      <div class="player-avatar">🎯</div>
+      <div class="player-name">Attaccante</div>
+      <div class="player-pos">Centravanti</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SCHEDULE ─── -->
+<!--
+  ════════════════════════════════════════════════════════
+  COME AGGIUNGERE / MODIFICARE PARTITE:
+  Ogni partita è un <div class="match-row">.
+  Cambia:
+    • .match-team-name (left)  → squadra di casa
+    • .match-team-name (right) → squadra ospite
+    • .match-score             → risultato (es. 2 – 1)
+    • .match-date              → data
+    • .match-badge + classe    → b-win / b-loss / b-draw / b-next
+  Per partite future aggiungi class="match-row upcoming" al div
+  e metti "vs" come testo nel .match-score.
+  Per aggiungere una partita: copia un intero .match-row
+  e incollalo dentro .matches-wrap.
+  ════════════════════════════════════════════════════════
+-->
+<section id="schedule">
+  <p class="sec-label reveal">Risultati &amp; Calendario</p>
+  <h2 class="sec-title reveal">LE PARTITE</h2>
+  <p class="sec-sub reveal">I nostri ultimi risultati e le prossime sfide.</p>
+
+  <div class="matches-wrap">
+    <div class="match-row reveal">
+      <div class="match-team-name">Futura Mellow</div>
+      <div class="match-mid">
+        <div class="match-score">3 – 1</div>
+        <div class="match-date">10 Mag 2025</div>
+        <span class="match-badge b-win">Vittoria</span>
+      </div>
+      <div class="match-team-name right">Rival FC</div>
+    </div>
+
+    <div class="match-row reveal reveal-delay-1">
+      <div class="match-team-name">Local Stars</div>
+      <div class="match-mid">
+        <div class="match-score">2 – 2</div>
+        <div class="match-date">26 Apr 2025</div>
+        <span class="match-badge b-draw">Pareggio</span>
+      </div>
+      <div class="match-team-name right">Futura Mellow</div>
+    </div>
+
+    <div class="match-row reveal reveal-delay-2">
+      <div class="match-team-name">Futura Mellow</div>
+      <div class="match-mid">
+        <div class="match-score">4 – 0</div>
+        <div class="match-date">12 Apr 2025</div>
+        <span class="match-badge b-win">Vittoria</span>
+      </div>
+      <div class="match-team-name right">Street Kings</div>
+    </div>
+
+    <div class="match-row reveal reveal-delay-3">
+      <div class="match-team-name">City United</div>
+      <div class="match-mid">
+        <div class="match-score">3 – 1</div>
+        <div class="match-date">29 Mar 2025</div>
+        <span class="match-badge b-loss">Sconfitta</span>
+      </div>
+      <div class="match-team-name right">Futura Mellow</div>
+    </div>
+
+    <div class="match-row upcoming reveal reveal-delay-4">
+      <div class="match-team-name">Futura Mellow</div>
+      <div class="match-mid">
+        <div class="match-score">vs</div>
+        <div class="match-date">7 Giu 2025 — ore 15:00</div>
+        <span class="match-badge b-next">Prossima</span>
+      </div>
+      <div class="match-team-name right">North FC</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── GALLERY ─── -->
+<section id="gallery">
+  <p class="sec-label reveal">Gallery</p>
+  <h2 class="sec-title reveal">I NOSTRI<br>MOMENTI</h2>
+  <p class="sec-sub reveal">Highlights dal campo e non solo. Seguici per vedere tutto.</p>
+
+  <div class="gallery-grid reveal">
+    <div class="g-item g0" style="font-size:4rem;">
+      <div class="g-bg"></div>
+      <span class="g-icon">📸</span>
+      <div class="g-label">Foto di Squadra</div>
+    </div>
+    <div class="g-item" style="font-size:3rem;">
+      <div class="g-bg" style="background:linear-gradient(135deg,rgba(59,7,100,0.7),rgba(124,58,237,0.4));"></div>
+      <span class="g-icon">🥅</span>
+      <div class="g-label">Match Day</div>
+    </div>
+    <div class="g-item" style="font-size:3rem;">
+      <div class="g-bg" style="background:linear-gradient(135deg,rgba(30,0,64,0.8),rgba(91,33,182,0.5));"></div>
+      <span class="g-icon">🏃</span>
+      <div class="g-label">Allenamento</div>
+    </div>
+    <div class="g-item" style="font-size:3rem;">
+      <div class="g-bg" style="background:linear-gradient(135deg,rgba(91,33,182,0.6),rgba(10,0,16,0.9));"></div>
+      <span class="g-icon">🤝</span>
+      <div class="g-label">Il Gruppo</div>
+    </div>
+    <div class="g-item" style="font-size:3rem;">
+      <div class="g-bg" style="background:linear-gradient(135deg,rgba(59,7,100,0.5),rgba(167,139,250,0.2));"></div>
+      <span class="g-icon">🏆</span>
+      <div class="g-label">Vittorie</div>
+    </div>
+  </div>
+
+  <div class="gallery-cta reveal">
+    <a href="https://www.instagram.com/mellowteam2024" target="_blank" class="btn-fill" style="display:inline-flex;align-items:center;gap:9px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      Vedi tutto su Instagram
+    </a>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">FUTURA <em>MELLOW</em></div>
+    <ul class="footer-links">
+      <li><a href="#about">Chi Siamo</a></li>
+      <li><a href="#roster">Squadra</a></li>
+      <li><a href="#schedule">Risultati</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+    </ul>
+    <div class="footer-ig">
+      <a href="https://www.instagram.com/mellowteam2024" target="_blank">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        @mellowteam2024
+      </a>
+    </div>
+  </div>
+  <div class="footer-copy">© 2024 Futura Mellow FC · Tutti i diritti riservati</div>
+</footer>
+
+<script>
+  /* cursor glow */
+  const glow = document.getElementById('cursorGlow');
+  document.addEventListener('mousemove', e => {
+    glow.style.left = e.clientX + 'px';
+    glow.style.top  = e.clientY + 'px';
+  });
+
+  /* nav scroll */
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  /* scroll reveal */
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  /* counter animation */
+  function animateCounter(el, target, duration = 1400) {
+    let start = null;
+    const step = ts => {
+      if (!start) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.floor(eased * target);
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    };
+    requestAnimationFrame(step);
+  }
+
+  const counterObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const target = parseInt(e.target.dataset.count);
+        if (!e.target.dataset.raw) animateCounter(e.target, target);
+        counterObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+</script>
+</body>
+</html>
