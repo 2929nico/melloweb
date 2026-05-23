@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -233,7 +234,7 @@
     }
     .btn-ghost:hover { border-color: var(--p5); color: var(--p5); }
 
-    /* hero right – ball */
+    /* hero right – 3-D canvas ball */
     .hero-right {
       display: flex;
       align-items: center;
@@ -242,53 +243,10 @@
       animation: fade-in .8s .5s forwards;
     }
 
-    .ball-scene {
-      position: relative;
-      width: min(360px,80vw);
+    #heroCanvas {
+      display: block;
+      width: min(360px, 80vw);
       aspect-ratio: 1;
-    }
-
-    .orbit {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      border: 1px solid rgba(167,139,250,0.2);
-      animation: orbit-spin linear infinite;
-    }
-    .orbit-1 { animation-duration: 14s; }
-    .orbit-2 { inset: 20px; border-color: rgba(167,139,250,0.12); animation-duration: 22s; animation-direction: reverse; }
-    .orbit-3 { inset: 40px; border-color: rgba(167,139,250,0.07); animation-duration: 32s; }
-
-    .orbit-dot {
-      position: absolute;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--p4);
-      top: -4px; left: 50%;
-      transform: translateX(-50%);
-      box-shadow: 0 0 10px var(--p4);
-    }
-
-    @keyframes orbit-spin { to { transform: rotate(360deg); } }
-
-    .ball-core {
-      position: absolute;
-      inset: 60px;
-      background: radial-gradient(circle at 38% 35%, #7c3aed, #2d0057);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 4.5rem;
-      box-shadow:
-        0 0 60px rgba(124,58,237,0.6),
-        0 0 120px rgba(124,58,237,0.25),
-        inset 0 -20px 40px rgba(0,0,0,0.4);
-      animation: ball-float 4s ease-in-out infinite;
-    }
-    @keyframes ball-float {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(-14px); }
     }
 
     /* hero stats strip */
@@ -787,12 +745,7 @@
     </div>
 
     <div class="hero-right">
-      <div class="ball-scene">
-        <div class="orbit orbit-1"><div class="orbit-dot"></div></div>
-        <div class="orbit orbit-2"><div class="orbit-dot"></div></div>
-        <div class="orbit orbit-3"><div class="orbit-dot"></div></div>
-        <div class="ball-core">⚽</div>
-      </div>
+      <canvas id="heroCanvas"></canvas>
     </div>
   </div>
 
@@ -1089,56 +1042,257 @@
 </footer>
 
 <script>
-  /* cursor glow */
+  /* ─── CURSOR GLOW ─── */
   const glow = document.getElementById('cursorGlow');
+  let currentGlowRgb = [124, 58, 237];
   document.addEventListener('mousemove', e => {
     glow.style.left = e.clientX + 'px';
     glow.style.top  = e.clientY + 'px';
   });
 
-  /* nav scroll */
+  /* ─── NAV SCROLL ─── */
   const nav = document.getElementById('mainNav');
   window.addEventListener('scroll', () => {
     nav.classList.toggle('scrolled', window.scrollY > 40);
-  });
+  }, { passive: true });
 
-  /* scroll reveal */
+  /* ─── SCROLL REVEAL ─── */
   const revealObserver = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        revealObserver.unobserve(e.target);
-      }
+      if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); }
     });
   }, { threshold: 0.12 });
-
   document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-  /* counter animation */
+  /* ─── COUNTER ANIMATION ─── */
   function animateCounter(el, target, duration = 1400) {
     let start = null;
     const step = ts => {
       if (!start) start = ts;
-      const progress = Math.min((ts - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      el.textContent = Math.floor(eased * target);
-      if (progress < 1) requestAnimationFrame(step);
-      else el.textContent = target;
+      const p = Math.min((ts - start) / duration, 1);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = p < 1 ? Math.floor(e * target) : target;
+      if (p < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
   }
-
   const counterObserver = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {
-        const target = parseInt(e.target.dataset.count);
-        if (!e.target.dataset.raw) animateCounter(e.target, target);
+        if (!e.target.dataset.raw) animateCounter(e.target, +e.target.dataset.count);
         counterObserver.unobserve(e.target);
       }
     });
   }, { threshold: 0.5 });
-
   document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+
+  /* ─── SECTION COLOR THEMES ─── */
+  const THEMES = {
+    hero:     { p3: '#5b21b6', p4: '#7c3aed', p5: '#a78bfa', glow: [124, 58,  237] },
+    about:    { p3: '#1e3a8a', p4: '#2563eb', p5: '#93c5fd', glow: [37,  99,  235] },
+    roster:   { p3: '#0f766e', p4: '#0d9488', p5: '#5eead4', glow: [13,  148, 136] },
+    schedule: { p3: '#9f1239', p4: '#e11d48', p5: '#fda4af', glow: [225, 29,  72]  },
+    gallery:  { p3: '#92400e', p4: '#d97706', p5: '#fcd34d', glow: [217, 119, 6]   },
+  };
+
+  let activeTheme = 'hero';
+  let themeRaf = null;
+  let threeObjs = null; // populated by Three.js IIFE below
+
+  function h2r(h) {
+    return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+  }
+  function r2h(r,g,b) {
+    return '#' + [r,g,b].map(v => Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0')).join('');
+  }
+  function lerpc(a, b, t) {
+    const [ar,ag,ab] = h2r(a), [br,bg,bb] = h2r(b);
+    return r2h(ar+(br-ar)*t, ag+(bg-ag)*t, ab+(bb-ab)*t);
+  }
+
+  function setTheme(name) {
+    if (name === activeTheme || !THEMES[name]) return;
+    const target = THEMES[name];
+    const root = document.documentElement;
+    const cs = getComputedStyle(root);
+    const fromP3 = cs.getPropertyValue('--p3').trim();
+    const fromP4 = cs.getPropertyValue('--p4').trim();
+    const fromP5 = cs.getPropertyValue('--p5').trim();
+    const fromG  = [...currentGlowRgb];
+    activeTheme = name;
+    if (themeRaf) cancelAnimationFrame(themeRaf);
+    let t0 = null;
+    function step(ts) {
+      if (!t0) t0 = ts;
+      const p = Math.min((ts - t0) / 700, 1);
+      const e = 1 - Math.pow(1 - p, 3); // cubic ease-out
+      root.style.setProperty('--p3', lerpc(fromP3, target.p3, e));
+      root.style.setProperty('--p4', lerpc(fromP4, target.p4, e));
+      root.style.setProperty('--p5', lerpc(fromP5, target.p5, e));
+      const g = target.glow;
+      const gr = Math.round(fromG[0] + (g[0]-fromG[0]) * e);
+      const gg = Math.round(fromG[1] + (g[1]-fromG[1]) * e);
+      const gb = Math.round(fromG[2] + (g[2]-fromG[2]) * e);
+      glow.style.background = `radial-gradient(circle,rgba(${gr},${gg},${gb},.12) 0%,transparent 70%)`;
+      if (p < 1) {
+        themeRaf = requestAnimationFrame(step);
+      } else {
+        currentGlowRgb = [...g];
+        if (threeObjs && typeof THREE !== 'undefined') {
+          const c4 = new THREE.Color(target.p4);
+          const c5 = new THREE.Color(target.p5);
+          threeObjs.light1.color.set(c4);
+          threeObjs.dotMats.forEach(m => m.color.set(c4));
+          threeObjs.particleMat.color.set(c5);
+          threeObjs.ringMats.forEach(m => m.color.set(c5));
+        }
+      }
+    }
+    themeRaf = requestAnimationFrame(step);
+  }
+
+  /* detect which section fills the most viewport and switch theme */
+  const SECTION_IDS = ['hero','about','roster','schedule','gallery'];
+  function getActiveSection() {
+    const vh = window.innerHeight;
+    let best = SECTION_IDS[0], bestV = 0;
+    SECTION_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const v = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0)) / vh;
+      if (v > bestV) { bestV = v; best = id; }
+    });
+    return best;
+  }
+  let sRaf = null;
+  window.addEventListener('scroll', () => {
+    if (sRaf) return;
+    sRaf = requestAnimationFrame(() => { sRaf = null; setTheme(getActiveSection()); });
+  }, { passive: true });
+
+  /* ─── THREE.JS HERO SCENE ─── */
+  (function initHeroScene() {
+    if (typeof THREE === 'undefined') return;
+    const canvas = document.getElementById('heroCanvas');
+    if (!canvas) return;
+
+    const sz = Math.min(360, window.innerWidth * 0.8);
+    const scene = new THREE.Scene();
+    const cam = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    cam.position.z = 4.5;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(sz, sz);
+
+    /* lights */
+    scene.add(new THREE.AmbientLight(0x3b0764, 2));
+    const light1 = new THREE.PointLight(0x7c3aed, 5, 20);
+    light1.position.set(2.5, 2, 3);
+    scene.add(light1);
+    const light2 = new THREE.PointLight(0xa78bfa, 2, 15);
+    light2.position.set(-2, -1, 2);
+    scene.add(light2);
+
+    /* soccer ball – phong sphere + icosahedron wireframe for panel lines */
+    const ball = new THREE.Mesh(
+      new THREE.SphereGeometry(1, 64, 64),
+      new THREE.MeshPhongMaterial({
+        color: 0xfafafa, specular: 0xa78bfa, shininess: 120,
+        emissive: 0x1e0040, emissiveIntensity: 0.4,
+      })
+    );
+    scene.add(ball);
+    const wire = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(1.002, 1),
+      new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true, transparent: true, opacity: 0.12 })
+    );
+    scene.add(wire);
+
+    /* orbit rings (tori at different tilt angles) */
+    const ringMats = [];
+    function makeRing(r, tube, rx, rz, opacity) {
+      const mat = new THREE.MeshBasicMaterial({ color: 0xa78bfa, transparent: true, opacity });
+      const mesh = new THREE.Mesh(new THREE.TorusGeometry(r, tube, 6, 128), mat);
+      mesh.rotation.x = rx; mesh.rotation.z = rz;
+      scene.add(mesh); ringMats.push(mat);
+      return mesh;
+    }
+    const ring1 = makeRing(1.8, 0.012, 0.30,  0.00, 0.25);
+    const ring2 = makeRing(2.2, 0.009, 1.20,  0.50, 0.16);
+    const ring3 = makeRing(2.6, 0.007, 2.10,  0.80, 0.10);
+
+    /* orbit dots – children of ring meshes so they revolve automatically */
+    const dotGeo = new THREE.SphereGeometry(0.065, 10, 10);
+    const dotMats = [];
+    function addDot(parent, r) {
+      const mat = new THREE.MeshBasicMaterial({ color: 0x7c3aed });
+      const mesh = new THREE.Mesh(dotGeo, mat);
+      mesh.position.set(r, 0, 0);
+      parent.add(mesh); dotMats.push(mat);
+    }
+    addDot(ring1, 1.8); addDot(ring2, 2.2); addDot(ring3, 2.6);
+
+    /* floating particles */
+    const pPos = new Float32Array(180 * 3);
+    for (let i = 0; i < 180; i++) {
+      const r = 1.6 + Math.random() * 2.8;
+      const θ = Math.random() * Math.PI * 2;
+      const φ = Math.acos(2 * Math.random() - 1);
+      pPos[i*3]   = r * Math.sin(φ) * Math.cos(θ);
+      pPos[i*3+1] = r * Math.sin(φ) * Math.sin(θ);
+      pPos[i*3+2] = r * Math.cos(φ);
+    }
+    const pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+    const particleMat = new THREE.PointsMaterial({ color: 0xa78bfa, size: 0.038, transparent: true, opacity: 0.65 });
+    const pts = new THREE.Points(pGeo, particleMat);
+    scene.add(pts);
+
+    /* expose refs for live colour updates on theme change */
+    threeObjs = { light1, dotMats, particleMat, ringMats };
+
+    /* mouse parallax */
+    let tRX = 0, tRY = 0, mRX = 0, mRY = 0;
+    document.addEventListener('mousemove', e => {
+      tRY = ((e.clientX / innerWidth)  * 2 - 1) *  0.40;
+      tRX = ((e.clientY / innerHeight) * 2 - 1) * -0.25;
+    });
+
+    /* render loop */
+    let t = 0;
+    (function loop() {
+      requestAnimationFrame(loop);
+      t += 0.008;
+      mRX += (tRX - mRX) * 0.04;
+      mRY += (tRY - mRY) * 0.04;
+
+      /* ball rotation + gentle float */
+      ball.rotation.y = t * 0.25 + mRY;
+      ball.rotation.x = mRX + Math.sin(t * 0.3) * 0.05;
+      wire.rotation.copy(ball.rotation);
+      const fy = Math.sin(t * 1.3) * 0.12;
+      ball.position.y = wire.position.y = fy;
+
+      /* ring spin around world-Y */
+      ring1.rotation.y =  t * 0.70;
+      ring2.rotation.y = -t * 0.45;
+      ring3.rotation.y =  t * 0.28;
+
+      /* particles drift */
+      pts.rotation.y  = t * 0.04;
+      pts.position.y  = fy * 0.3;
+
+      renderer.render(scene, cam);
+    })();
+
+    /* responsive resize */
+    window.addEventListener('resize', () => {
+      const s = Math.min(360, innerWidth * 0.8);
+      renderer.setSize(s, s);
+    });
+  })();
 </script>
 </body>
 </html>
